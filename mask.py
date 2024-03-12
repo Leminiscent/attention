@@ -42,46 +42,45 @@ def main():
 
 def get_mask_token_index(mask_token_id, inputs):
     """
-    Return the index of the token with the specified `mask_token_id`, or
+    Returns the index of the token with the specified `mask_token_id`, or
     `None` if not present in the `inputs`.
     """
-    # TODO: Implement this function
-    raise NotImplementedError
-
+    input_ids = (
+        inputs["input_ids"].numpy().flatten()
+    )  # Convert to 1D array for easy iteration
+    for index, token_id in enumerate(input_ids):
+        if token_id == mask_token_id:
+            return index
+    return None
 
 
 def get_color_for_attention_score(attention_score):
     """
-    Return a tuple of three integers representing a shade of gray for the
-    given `attention_score`. Each value should be in the range [0, 255].
+    Returns a tuple of three integers representing a shade of gray for the
+    given `attention_score`. Each value is in the range [0, 255].
     """
-    # TODO: Implement this function
-    raise NotImplementedError
-
+    intensity = int(255 * attention_score)  # Linear scaling of the score
+    return (intensity, intensity, intensity)  # Grayscale color
 
 
 def visualize_attentions(tokens, attentions):
     """
-    Produce a graphical representation of self-attention scores.
+    Produces a graphical representation of self-attention scores.
 
-    For each attention layer, one diagram should be generated for each
-    attention head in the layer. Each diagram should include the list of
+    For each attention layer, one diagram is generated for each
+    attention head in the layer. Each diagram includes the list of
     `tokens` in the sentence. The filename for each diagram should
     include both the layer number (starting count from 1) and head number
     (starting count from 1).
     """
-    # TODO: Update this function to produce diagrams for all layers and heads.
-    generate_diagram(
-        1,
-        1,
-        tokens,
-        attentions[0][0][0]
-    )
+    for i, layer in enumerate(attentions):
+        for j, head in enumerate(layer[0]):  # Beam number is always 0
+            generate_diagram(i + 1, j + 1, tokens, head)
 
 
 def generate_diagram(layer_number, head_number, tokens, attention_weights):
     """
-    Generate a diagram representing the self-attention scores for a single
+    Generates a diagram representing the self-attention scores for a single
     attention head. The diagram shows one row and column for each of the
     `tokens`, and cells are shaded based on `attention_weights`, with lighter
     cells corresponding to higher attention scores.
@@ -103,7 +102,7 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
             (image_size - PIXELS_PER_WORD, PIXELS_PER_WORD + i * GRID_SIZE),
             token,
             fill="white",
-            font=FONT
+            font=FONT,
         )
         token_image = token_image.rotate(90)
         img.paste(token_image, mask=token_image)
@@ -114,7 +113,7 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
             (PIXELS_PER_WORD - width, PIXELS_PER_WORD + i * GRID_SIZE),
             token,
             fill="white",
-            font=FONT
+            font=FONT,
         )
 
     # Draw each word
